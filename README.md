@@ -15,7 +15,7 @@
 发布到公开 GitHub 仓库后，可在模块文件页面点击 **Raw**，复制地址并添加到 Surge：
 
 ```text
-https://raw.githubusercontent.com/q546834763-sketch/surge-modules/main/modules/telegram-to-swiftgram.sgmodule
+https://raw.githubusercontent.com/haorenfunia/surge-modules/main/modules/telegram-to-swiftgram.sgmodule
 ```
 
 启用模块后，需要允许 Surge 对 `t.me`、`telegram.me` 和 `telegram.dog` 执行 MITM。

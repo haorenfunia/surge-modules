@@ -20,7 +20,19 @@ https://raw.githubusercontent.com/haorenfunia/surge-modules/main/modules/telegra
 
 启用模块后，需要允许 Surge 对 `t.me`、`telegram.me` 和 `telegram.dog` 执行 MITM。
 
+## 菜鸟包裹去广告
+
+过滤菜鸟包裹首页、搜索栏、寄件入口、发现页和开屏等广告内容。
+
+模块文件：[`modules/cainiao-adblock.sgmodule`](modules/cainiao-adblock.sgmodule)
+
+```text
+https://raw.githubusercontent.com/haorenfunia/surge-modules/main/modules/cainiao-adblock.sgmodule
+```
+
+该模块使用 URL Rewrite、Body Rewrite 和 MITM；请确认当前 Surge 版本支持 `http-response-jq`。
+
 ## 说明
 
-- 模块仅重写 Telegram 链接，不包含账号、密码、Token 或证书。
+- 仓库中的模块不包含账号、密码、Token 或证书。
 - 仅供个人使用与测试。

@@ -1,0 +1,11 @@
+#!name=Telegram 链接跳转 Swiftgram
+#!desc=使用 Swiftgram 正确的 sg://parseurl 深链格式打开 Telegram 链接。
+#!author=Minis
+
+[URL Rewrite]
+^https?://(?:www\.)?t\.me/(.*) sg://parseurl?url=https://t.me/$1 302
+^https?://(?:www\.)?telegram\.me/(.*) sg://parseurl?url=https://telegram.me/$1 302
+^https?://(?:www\.)?telegram\.dog/(.*) sg://parseurl?url=https://telegram.dog/$1 302
+
+[MITM]
+hostname = %APPEND% t.me, telegram.me, telegram.dog

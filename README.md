@@ -32,6 +32,16 @@ https://raw.githubusercontent.com/haorenfunia/surge-modules/main/modules/cainiao
 
 该模块使用 URL Rewrite、Body Rewrite 和 MITM；请确认当前 Surge 版本支持 `http-response-jq`。
 
+## 书源直连规则集
+
+用于书源相关域名直连。在 Surge 的 `[Rule]` 中添加：
+
+```text
+RULE-SET,https://raw.githubusercontent.com/haorenfunia/surge-modules/main/rules/book-sources.list,DIRECT,update-interval=86400
+```
+
+规则文件：[`rules/book-sources.list`](rules/book-sources.list)
+
 ## 说明
 
 - 仓库中的模块不包含账号、密码、Token 或证书。

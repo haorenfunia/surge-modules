@@ -42,6 +42,16 @@ RULE-SET,https://raw.githubusercontent.com/haorenfunia/surge-modules/main/rules/
 
 规则文件：[`rules/book-sources.list`](rules/book-sources.list)
 
+## Mono 直连规则集
+
+用于 Mono 软件相关域名直连。在 Surge 的 `[Rule]` 中添加：
+
+```text
+RULE-SET,https://raw.githubusercontent.com/haorenfunia/surge-modules/main/rules/mono.list,DIRECT,update-interval=86400
+```
+
+规则文件：[`rules/mono.list`](rules/mono.list)
+
 ## 说明
 
 - 仓库中的模块不包含账号、密码、Token 或证书。

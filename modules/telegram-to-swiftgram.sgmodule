@@ -2,7 +2,7 @@
 #!desc=将 Telegram 链接（t.me / telegram.me / telegram.dog）统一跳转到指定第三方客户端。每个客户端参数填 1 开启、0 关闭；同时开启多个时按优先级取最先开启的一个：Swiftgram > Nicegram > Turrit > Nagram。需要允许 Surge 对相关域名执行 MITM。
 #!author=Minis
 #!arguments=SWIFTGRAM:1,NICEGRAM:0,TURRIT:0,NAGRAM:0
-#!arguments-desc=每个参数填 1 开启、0 关闭。优先级从上到下依次取最先开启的一个。Swiftgram / Nicegram 使用 parseurl 直传原链接；Turrit / Nagram 转换为标准 Telegram 动作深链并替换 scheme 前缀（turrit:// / nagram://）。
+#!arguments-desc=每个参数填 1 开启、0 关闭。优先级从上到下依次取最先开启的一个。Swiftgram / Nicegram 使用 parseurl 直传原链接；Turrit 替换为 turrit://；Nagram 使用标准 tg:// 深链（Nagram 仅解析 tg:// 动作，且设备上不能同时装官方 Telegram 等占用 tg:// 的客户端）。
 
 [MITM]
 hostname = %APPEND% t.me, www.t.me, telegram.me, www.telegram.me, telegram.dog, www.telegram.dog

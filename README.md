@@ -2,15 +2,18 @@
 
 个人使用的 Surge 模块集合。
 
-## Telegram 链接跳转 Swiftgram
+## Telegram 链接跳转（多客户端）
 
-将以下 Telegram 链接交给 Swiftgram 打开：
+将 Telegram 链接（`t.me` / `telegram.me` / `telegram.dog`）统一跳转到指定的第三方客户端打开，支持：
 
-- `t.me`
-- `telegram.me`
-- `telegram.dog`
+- Swiftgram、Nicegram、Turrit、Nagram
+- 在 Surge 模块编辑界面中，每个客户端参数填 `1` 开启、`0` 关闭
+- 同时开启多个时，按优先级取最先开启的一个：Swiftgram > Nicegram > Turrit > Nagram
+- 支持裸域名（如 `https://t.me`）与 `www.` 子域，并保留查询参数
 
 模块文件：[`modules/telegram-to-swiftgram.sgmodule`](modules/telegram-to-swiftgram.sgmodule)
+
+转换脚本：[`modules/telegram-jump.js`](modules/telegram-jump.js)
 
 发布到公开 GitHub 仓库后，可在模块文件页面点击 **Raw**，复制地址并添加到 Surge：
 

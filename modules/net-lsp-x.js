@@ -324,7 +324,7 @@ async function getDirectRequestInfo({ PROXIES = [] } = {}) {
   const { CN_IP, CN_INFO } = await getDirectInfo(undefined, $.lodash_get(arg, 'DOMESTIC_IPv4'))
   const { POLICY } = await getRequestInfo(
     new RegExp(
-      `cip\\.cc|for${keyb}\\.${keya}${bay}\\.cn|rmb\\.${keyc}${keyd}\\.com\\.cn|api-v3\\.${keya}${bay}\\.cn|ipservice\\.ws\\.126\\.net|api\\.bilibili\\.com|api\\.live\\.bilibili\\.com|myip\\.ipip\\.net|ip\\.ip233\\.cn|ip\\.im|ips\\.market\\.alicloudapi\\.com|api\\.ip\\.plus|ip\\.qtfm\\.cn|dashi\\.163\\.com|api\\.zhuishushenqi\\.com|admin-app\\.edifier\\.com|foundation-ipv4\\.youdao\\.com|ipv4\\.netart\\.cn|ip\\.netart\\.cn`
+      `cip\\.cc|for${keyb}\\.${keya}${bay}\\.cn|rmb\\.${keyc}${keyd}\\.com\\.cn|api-v3\\.${keya}${bay}\\.cn|ipservice\\.ws\\.126\\.net|api\\.bilibili\\.com|api\\.live\\.bilibili\\.com|myip\\.ipip\\.net|ip\\.im|ips\\.market\\.alicloudapi\\.com|api\\.ip\\.plus|ip\\.qtfm\\.cn|dashi\\.163\\.com|api\\.zhuishushenqi\\.com|admin-app\\.edifier\\.com|foundation-ipv4\\.youdao\\.com|ipv4\\.netart\\.cn|ip\\.netart\\.cn`
     ),
     PROXIES
   )
@@ -395,11 +395,13 @@ async function getDirectInfo(ip, provider) {
   let CN_IP
   let CN_INFO
   let isCN
+  // Keep the old ip233 argument working through the live qtfm endpoint.
+  provider = provider == 'ip233' ? 'qtfm' : provider
   const msg = `使用 ${provider || 'pingan'} 查询 ${ip ? ip : '分流'} 信息`
   if (provider == 'cip') {
     try {
       const res = await http({
-        url: `http://cip.cc/${ip ? encodeURIComponent(ip) : ''}`,
+        url: `https://cip.cc/${ip ? encodeURIComponent(ip) : ''}`,
         headers: { 'User-Agent': 'curl/7.16.3 (powerpc-apple-darwin9.0) libcurl/7.16.3' },
       })
       let body = String($.lodash_get(res, 'body'))
@@ -683,35 +685,6 @@ async function getDirectInfo(ip, provider) {
     } catch (e) {
       $.logErr(`${msg} 发生错误: ${e.message || e}`)
     }
-  } else if (!ip && provider == 'ip233') {
-    try {
-      const res = await http({
-        url: `https://ip.ip233.cn/ip`,
-        headers: {
-          Referer: 'https://ip233.cn/',
-          'User-Agent':
-            'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.0.0 Safari/537.36 Edg/121.0.0.0',
-        },
-      })
-      let body = String($.lodash_get(res, 'body'))
-      try {
-        body = JSON.parse(body)
-      } catch (e) {}
-
-      const countryCode = $.lodash_get(body, 'country')
-      isCN = countryCode === 'CN'
-      CN_IP = $.lodash_get(body, 'ip')
-      CN_INFO = CN_INFO = [
-        ['位置:', getflag(countryCode), $.lodash_get(body, 'desc').replace(/中国\s*/, '')].filter(i => i).join(' '),
-        $.lodash_get(arg, 'ORG') == 1
-          ? ['组织:', $.lodash_get(body, 'org') || '-'].filter(i => i).join(' ')
-          : undefined,
-      ]
-        .filter(i => i)
-        .join('\n')
-    } catch (e) {
-      $.logErr(`${msg} 发生错误: ${e.message || e}`)
-    }
   } else if (provider == 'ipim') {
     try {
       const res = await ipim(ip)
@@ -873,7 +846,9 @@ async function getProxyInfo(ip, provider) {
   let PROXY_INFO
   let PROXY_PRIVACY
 
-  const msg = `使用 ${provider || 'ipapi'} 查询 ${ip ? ip : '分流'} 信息`
+  // Keep old module arguments working while using the current HTTPS providers.
+  provider = { ipapi: 'ipwhois', ip233: 'qtfm' }[provider] || provider || 'ipwhois'
+  const msg = `使用 ${provider} 查询 ${ip ? ip : '分流'} 信息`
 
   if (provider == 'ipinfo') {
     try {

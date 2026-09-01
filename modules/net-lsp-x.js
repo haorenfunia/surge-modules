@@ -159,8 +159,31 @@ let content = ''
       // 第二入口保留交叉验证，但不能回退到用户配置的旧 ip-api 城市库。
       const entranceProxyInfo = await getProxyInfo(ENTRANCE_IP, 'ipwhois')
       const entranceFallbackInfo = await getProxyInfo(ENTRANCE_IP, 'ipinfo-lite')
-      const ENTRANCE_INFO2 =
+      let ENTRANCE_INFO2 =
         $.lodash_get(entranceProxyInfo, 'PROXY_INFO') || $.lodash_get(entranceFallbackInfo, 'PROXY_INFO') || ''
+      // Surge 直连失败时，旧库只用于补齐运营商/组织/ASN，不能把它的城市结果带回来。
+      if (!ENTRANCE_INFO2) {
+        const entranceLegacyInfo = await getProxyInfo(ENTRANCE_IP, $.lodash_get(arg, 'LANDING_IPv4'))
+        const entranceLocation = String(ENTRANCE_INFO1 || '')
+          .split(/\n/)
+          .find(i => /^位置\s*[:：]/.test(i))
+        const legacyMetadata = String($.lodash_get(entranceLegacyInfo, 'PROXY_INFO') || '')
+          .split(/\n/)
+          .filter(i => i && !/^位置\s*[:：]/.test(i))
+        const legacyAsn = legacyMetadata.find(i => /^ASN\s*[:：]/.test(i))
+        const legacyOrg = legacyMetadata.find(i => /^组织\s*[:：]/.test(i))
+        const legacyOperator = legacyMetadata.find(i => /^运营商\s*[:：]/.test(i))
+        const verifiedOperator = legacyAsn
+          ? `运营商: ${legacyAsn.replace(/^ASN\s*[:：]\s*/, '').replace(/^AS\d+\s+/, '')}`
+          : legacyOrg
+            ? `运营商: ${legacyOrg.replace(/^组织\s*[:：]\s*/, '')}`
+            : legacyOperator
+        const entranceMetadata = [
+          verifiedOperator,
+          ...legacyMetadata.filter(i => i !== legacyOperator),
+        ].filter((i, index, arr) => i && arr.indexOf(i) === index)
+        ENTRANCE_INFO2 = entranceLocation ? [entranceLocation, ...entranceMetadata].join('\n') : entranceMetadata.join('\n')
+      }
       if (ENTRANCE_INFO1 && isCN) {
         ENTRANCE = `入口: ${maskIP(ENTRANCE_IP) || '-'}\n${maskAddr(ENTRANCE_INFO1)}`
       }

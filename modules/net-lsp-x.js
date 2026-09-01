@@ -174,6 +174,7 @@ let content = ''
           ENTRANCE = `入口: ${maskIP(ENTRANCE_IP) || '-'}\n${maskAddr(ENTRANCE_INFO2)}`
         }
       }
+      }
     if (ENTRANCE) {
       ENTRANCE = `${ENTRANCE}\n\n`
     }

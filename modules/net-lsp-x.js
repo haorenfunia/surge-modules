@@ -157,20 +157,12 @@ let content = ''
           getDirectInfo(ENTRANCE_IP, $.lodash_get(arg, 'DOMESTIC_IPv4')),
           getProxyInfo(ENTRANCE_IP, $.lodash_get(arg, 'LANDING_IPv4')),
         ])
-      // 国内接口的国外 IP 解析过于离谱 排除掉
+      // 国内库对中国 IP 的城市级结果更适合作为入口展示，避免第二家库的冲突结果覆盖它。
       if (ENTRANCE_INFO1 && isCN) {
         ENTRANCE = `入口: ${maskIP(ENTRANCE_IP) || '-'}\n${maskAddr(ENTRANCE_INFO1)}`
-      }
-      if (ENTRANCE_INFO2) {
-        if (ENTRANCE) {
-          ENTRANCE = `${ENTRANCE.replace(/^(.*?):/gim, '$1¹:')}\n${maskAddr(
-            ENTRANCE_INFO2.replace(/^(.*?):/gim, '$1²:')
-          )}`
-        } else {
-          ENTRANCE = `入口: ${maskIP(ENTRANCE_IP) || '-'}\n${maskAddr(ENTRANCE_INFO2)}`
-        }
-      }
-    }
+      } else if (ENTRANCE_INFO2) {
+        ENTRANCE = `入口: ${maskIP(ENTRANCE_IP) || '-'}\n${maskAddr(ENTRANCE_INFO2)}`
+      }    }
     if (ENTRANCE) {
       ENTRANCE = `${ENTRANCE}\n\n`
     }
@@ -324,7 +316,7 @@ async function getDirectRequestInfo({ PROXIES = [] } = {}) {
   const { CN_IP, CN_INFO } = await getDirectInfo(undefined, $.lodash_get(arg, 'DOMESTIC_IPv4'))
   const { POLICY } = await getRequestInfo(
     new RegExp(
-      `cip\\.cc|for${keyb}\\.${keya}${bay}\\.cn|rmb\\.${keyc}${keyd}\\.com\\.cn|api-v3\\.${keya}${bay}\\.cn|ipservice\\.ws\\.126\\.net|api\\.bilibili\\.com|api\\.live\\.bilibili\\.com|myip\\.ipip\\.net|ip\\.im|ips\\.market\\.alicloudapi\\.com|api\\.ip\\.plus|ip\\.qtfm\\.cn|dashi\\.163\\.com|api\\.zhuishushenqi\\.com|admin-app\\.edifier\\.com|foundation-ipv4\\.youdao\\.com|ipv4\\.netart\\.cn|ip\\.netart\\.cn`
+      `cip\\.cc|for${keyb}\\.${keya}${bay}\\.cn|rmb\\.${keyc}${keyd}\\.com\\.cn|api-v3\\.${keya}${bay}\\.cn|ipservice\\.ws\\.126\\.net|api\\.bilibili\\.com|api\\.live\\.bilibili\\.com|myip\\.ipip\\.net|ip\\.ip233\\.cn|ip\\.im|ips\\.market\\.alicloudapi\\.com|api\\.ip\\.plus|ip\\.qtfm\\.cn|dashi\\.163\\.com|api\\.zhuishushenqi\\.com|admin-app\\.edifier\\.com|foundation-ipv4\\.youdao\\.com|ipv4\\.netart\\.cn|ip\\.netart\\.cn`
     ),
     PROXIES
   )
@@ -352,12 +344,14 @@ async function getRequestInfo(regexp, PROXIES = []) {
 
   try {
     if ($.isSurge()) {
-      const { requests } = await httpAPI('/v1/requests/recent', 'GET')
-      const request = requests.slice(0, 10).find(i => regexp.test(i.URL))
+      const { requests = [] } = await httpAPI('/v1/requests/recent', 'GET')
+      const request = requests.slice(0, 30).find(i => regexp.test(String(i.URL || i.url || '')))
+      if (!request) throw new Error('最近请求中未找到 IP 查询接口')
       // $.log('recent request', $.toStr(request))
-      POLICY = request.policyName
-      if (/\(Proxy\)/.test(request.remoteAddress)) {
-        IP = request.remoteAddress.replace(/\s*\(Proxy\)\s*/, '')
+      POLICY = request.policyName || request.policy || ''
+      const remoteAddress = String(request.remoteAddress || '')
+      if (/\(Proxy\)/.test(remoteAddress)) {
+        IP = remoteAddress.replace(/\s*\(Proxy\)\s*/, '')
       }
     } else if ($.isStash()) {
       const res = await $.http.get({

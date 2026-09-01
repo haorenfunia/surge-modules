@@ -846,8 +846,8 @@ async function getProxyInfo(ip, provider) {
   let PROXY_INFO
   let PROXY_PRIVACY
 
-  // Keep old module arguments working while using the current HTTPS providers.
-  provider = { ipapi: 'ipwhois', ip233: 'qtfm' }[provider] || provider || 'ipwhois'
+  // Keep the old ip233 argument working while retaining the original ipapi path.
+  provider = { ip233: 'qtfm' }[provider] || provider || 'ipapi'
   const msg = `使用 ${provider} 查询 ${ip ? ip : '分流'} 信息`
 
   if (provider == 'ipinfo') {

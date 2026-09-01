@@ -152,17 +152,28 @@ let content = ''
       if (entranceDelay) {
         await $.wait(1000 * entranceDelay)
       }
-      let [{ CN_INFO: ENTRANCE_INFO1 = '', isCN = false } = {}, { PROXY_INFO: ENTRANCE_INFO2 = '' } = {}] =
-        await Promise.all([
-          getDirectInfo(ENTRANCE_IP, $.lodash_get(arg, 'DOMESTIC_IPv4')),
-          getProxyInfo(ENTRANCE_IP, $.lodash_get(arg, 'LANDING_IPv4')),
-        ])
-      // 国内库对中国 IP 的城市级结果更适合作为入口展示，避免第二家库的冲突结果覆盖它。
+      const { CN_INFO: ENTRANCE_INFO1 = '', isCN = false } = await getDirectInfo(
+        ENTRANCE_IP,
+        $.lodash_get(arg, 'DOMESTIC_IPv4')
+      )
+      // 保留第二库交叉验证，但使用 ipwho.is，避免 ip-api.com 的城市库冲突。
+      const entranceProxyInfo = await getProxyInfo(ENTRANCE_IP, 'ipwhois')
+      const ENTRANCE_INFO2 =
+        $.lodash_get(entranceProxyInfo, 'PROXY_INFO') ||
+        $.lodash_get(await getProxyInfo(ENTRANCE_IP, $.lodash_get(arg, 'LANDING_IPv4')), 'PROXY_INFO') ||
+        ''
       if (ENTRANCE_INFO1 && isCN) {
         ENTRANCE = `入口: ${maskIP(ENTRANCE_IP) || '-'}\n${maskAddr(ENTRANCE_INFO1)}`
-      } else if (ENTRANCE_INFO2) {
-        ENTRANCE = `入口: ${maskIP(ENTRANCE_IP) || '-'}\n${maskAddr(ENTRANCE_INFO2)}`
-      }    }
+      }
+      if (ENTRANCE_INFO2) {
+        if (ENTRANCE) {
+          ENTRANCE = `${ENTRANCE.replace(/^(.*?):/gim, '$1¹:')}\n${maskAddr(
+            ENTRANCE_INFO2.replace(/^(.*?):/gim, '$1²:')
+          )}`
+        } else {
+          ENTRANCE = `入口: ${maskIP(ENTRANCE_IP) || '-'}\n${maskAddr(ENTRANCE_INFO2)}`
+        }
+      }
     if (ENTRANCE) {
       ENTRANCE = `${ENTRANCE}\n\n`
     }

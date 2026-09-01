@@ -156,12 +156,11 @@ let content = ''
         ENTRANCE_IP,
         $.lodash_get(arg, 'DOMESTIC_IPv4')
       )
-      // 保留第二库交叉验证，但使用 ipwho.is，避免 ip-api.com 的城市库冲突。
+      // 第二入口保留交叉验证，但不能回退到用户配置的旧 ip-api 城市库。
       const entranceProxyInfo = await getProxyInfo(ENTRANCE_IP, 'ipwhois')
+      const entranceFallbackInfo = await getProxyInfo(ENTRANCE_IP, 'ipinfo-lite')
       const ENTRANCE_INFO2 =
-        $.lodash_get(entranceProxyInfo, 'PROXY_INFO') ||
-        $.lodash_get(await getProxyInfo(ENTRANCE_IP, $.lodash_get(arg, 'LANDING_IPv4')), 'PROXY_INFO') ||
-        ''
+        $.lodash_get(entranceProxyInfo, 'PROXY_INFO') || $.lodash_get(entranceFallbackInfo, 'PROXY_INFO') || ''
       if (ENTRANCE_INFO1 && isCN) {
         ENTRANCE = `入口: ${maskIP(ENTRANCE_IP) || '-'}\n${maskAddr(ENTRANCE_INFO1)}`
       }
@@ -174,7 +173,7 @@ let content = ''
           ENTRANCE = `入口: ${maskIP(ENTRANCE_IP) || '-'}\n${maskAddr(ENTRANCE_INFO2)}`
         }
       }
-      }
+    }
     if (ENTRANCE) {
       ENTRANCE = `${ENTRANCE}\n\n`
     }
@@ -856,7 +855,35 @@ async function getProxyInfo(ip, provider) {
   provider = { ip233: 'qtfm' }[provider] || provider || 'ipapi'
   const msg = `使用 ${provider} 查询 ${ip ? ip : '分流'} 信息`
 
-  if (provider == 'ipinfo') {
+  if (provider == 'ipinfo-lite') {
+    try {
+      const res = await http({
+        ...(ip ? {} : getNodeOpt()),
+        url: `https://ipinfo.io${ip ? `/${encodeURIComponent(ip)}` : ''}/json`,
+        headers: {
+          'User-Agent':
+            'Mozilla/5.0 (iPhone CPU iPhone OS 13_2_3 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/13.0.3 Mobile/15E148 Safari/604.1 Edg/109.0.0.0',
+        },
+      })
+      let body = String($.lodash_get(res, 'body'))
+      try {
+        body = JSON.parse(body)
+      } catch (e) {}
+      if ($.lodash_get(body, 'error')) throw new Error($.lodash_get(body, 'error.message') || 'ipinfo 查询失败')
+
+      PROXY_IP = ip || $.lodash_get(body, 'ip')
+      PROXY_INFO = [
+        ['位置:', getflag($.lodash_get(body, 'country')), $.lodash_get(body, 'country'), $.lodash_get(body, 'region'), $.lodash_get(body, 'city')]
+          .filter(i => i)
+          .join(' '),
+        ['运营商:', $.lodash_get(body, 'org') || '-'].filter(i => i).join(' '),
+      ]
+        .filter(i => i)
+        .join('\n')
+    } catch (e) {
+      $.logErr(`${msg} 发生错误: ${e.message || e}`)
+    }
+  } else if (provider == 'ipinfo') {
     try {
       let token = $.lodash_get(arg, 'LANDING_IPv4_KEY')
       if (!token) throw new Error('请在 LANDING_IPv4_KEY 填写 ipinfo 的 token')

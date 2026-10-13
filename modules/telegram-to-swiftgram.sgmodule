@@ -1,11 +1,11 @@
 #!name=Telegram 链接跳转（多客户端）
 #!desc=将 Telegram 链接（t.me / telegram.me / telegram.dog）统一跳转到指定第三方客户端。每个客户端参数填 1 开启、0 关闭；同时开启多个时按优先级取最先开启的一个：Swiftgram > Nicegram > Turrit > Nagram > Nyugram。需要允许 Surge 对相关域名执行 MITM。
 #!author=Minis
-#!arguments=SWIFTGRAM:1,NICEGRAM:0,TURRIT:0,NAGRAM:0,NYUGRAM:0
-#!arguments-desc=每个参数填 1 开启、0 关闭。优先级从上到下依次取最先开启的一个。Swiftgram / Nicegram / Nyugram 使用 parseurl 直传原链接；Nyugram 使用 nyugram://parseurl?url=；Turrit 替换为 turrit://；Nagram 使用独立 nagram:// 深链（需支持 na:// / nagram:// 的新版 Nagram，截图版本为 12.9.4 (33347)），可与官方 Telegram 共存。
+#!arguments=SWIFTGRAM:0,NICEGRAM:0,TURRIT:0,NAGRAM:0,NYUGRAM:1
+#!arguments-desc=默认使用 Nyugram。每个参数填 1 开启、0 关闭；切换客户端时请只保留目标客户端为 1，其余全部设为 0。升级后如保留了旧参数，请重新设置或删除模块后重新添加。优先级从上到下依次取最先开启的一个。Swiftgram / Nicegram / Nyugram 使用 parseurl 直传原链接；Nyugram 使用 nyugram://parseurl?url=；Turrit 替换为 turrit://；Nagram 使用独立 nagram:// 深链（需支持 na:// / nagram:// 的新版 Nagram，截图版本为 12.9.4 (33347)），可与官方 Telegram 共存。
 
 [MITM]
 hostname = %APPEND% t.me, www.t.me, telegram.me, www.telegram.me, telegram.dog, www.telegram.dog
 
 [Script]
-Telegram 跳转 = type=http-request,pattern=^https?:\/\/(?:www\.)?(?:t\.me|telegram\.me|telegram\.dog)(?:\/|$),script-path=https://raw.githubusercontent.com/haorenfunia/surge-modules/main/modules/telegram-jump.js,argument="swiftgram={{{SWIFTGRAM}}}&nicegram={{{NICEGRAM}}}&turrit={{{TURRIT}}}&nagram={{{NAGRAM}}}&nyugram={{{NYUGRAM}}}"
+Telegram 跳转 = type=http-request,pattern=^https?:\/\/(?:www\.)?(?:t\.me|telegram\.me|telegram\.dog)(?:\/|$),script-path=https://raw.githubusercontent.com/haorenfunia/surge-modules/271dd45/modules/telegram-jump.js,argument="swiftgram={{{SWIFTGRAM}}}&nicegram={{{NICEGRAM}}}&turrit={{{TURRIT}}}&nagram={{{NAGRAM}}}&nyugram={{{NYUGRAM}}}"

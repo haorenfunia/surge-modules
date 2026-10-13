@@ -5,7 +5,7 @@
  *  - 目标客户端由模块参数决定（1 启用 / 0 禁用），同时开启多个时按 CLIENTS 顺序取最先开启的一个
  *
  * 说明：
- *  - parseurl 客户端（swiftgram / nicegram）：直接传递原始链接
+ *  - parseurl 客户端（swiftgram / nicegram / nyugram）：直接传递原始链接
  *  - action 客户端：转换为标准 Telegram 动作深链（resolve / join / msg_url / proxy ...），再替换 scheme 前缀
  *  - 若某客户端的 scheme 前缀与你安装的版本不一致，修改下面 CLIENTS 里的 scheme 值即可
  */
@@ -14,7 +14,8 @@ var CLIENTS = [
   { id: 'swiftgram', label: 'Swiftgram', kind: 'parseurl', scheme: 'sg://parseurl?url=' },
   { id: 'nicegram',  label: 'Nicegram',  kind: 'parseurl', scheme: 'ng://parseurl?url=' },
   { id: 'turrit',    label: 'Turrit',    kind: 'action',   scheme: 'turrit://' },
-  { id: 'nagram',    label: 'Nagram',    kind: 'action',   scheme: 'nagram://' }
+  { id: 'nagram',    label: 'Nagram',    kind: 'action',   scheme: 'nagram://' },
+  { id: 'nyugram',   label: 'Nyugram',   kind: 'parseurl', scheme: 'nyugram://parseurl?url=' }
 ];
 
 function parseQuery(str) {

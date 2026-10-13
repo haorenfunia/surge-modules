@@ -14,7 +14,7 @@ var CLIENTS = [
   { id: 'swiftgram', label: 'Swiftgram', kind: 'parseurl', scheme: 'sg://parseurl?url=' },
   { id: 'nicegram',  label: 'Nicegram',  kind: 'parseurl', scheme: 'ng://parseurl?url=' },
   { id: 'turrit',    label: 'Turrit',    kind: 'action',   scheme: 'turrit://' },
-  { id: 'nagram',    label: 'Nagram',    kind: 'action',   scheme: 'tg://' }
+  { id: 'nagram',    label: 'Nagram',    kind: 'action',   scheme: 'nagram://' }
 ];
 
 function parseQuery(str) {

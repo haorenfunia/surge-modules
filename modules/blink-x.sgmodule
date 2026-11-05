@@ -1,0 +1,12 @@
+#!name=blink增强（Surge）
+#!desc=在 X/Twitter 网页自动尝试打开 Blink；保留手动按钮。需安装 Blink、开启 MitM 并信任证书。脚本从 haorenfunia/surge-modules 自动下载。
+
+# Adapted from nori5555/blink-qx v2.1.2
+# Original snippet: https://raw.githubusercontent.com/nori5555/blink-qx/main/blink-x.snippet.conf
+# Original script: https://raw.githubusercontent.com/nori5555/blink-qx/v2.1.2/blink-x.js
+
+[Script]
+blink-x = type=http-response, pattern=^https:\/\/(?:www\.|mobile\.)?(?:x|twitter)\.com\/(?!i\/api(?:\/|$)|api(?:\/|$)).*, requires-body=true, max-size=5242880, timeout=10, script-path=https://raw.githubusercontent.com/haorenfunia/surge-modules/main/modules/blink-x.surge.js
+
+[MITM]
+hostname = %APPEND% x.com, www.x.com, mobile.x.com, twitter.com, www.twitter.com, mobile.twitter.com
